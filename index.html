@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Investment Analytics | Terminal Portfolio</title>
+    <title>Macro-Investment SQL Lab | Andrey Zakharov</title>
     <link rel="stylesheet" href="style.css">
-    <!-- Load Chart.js CDN -->
+    <!-- Fixed Chart.js CDN Import -->
     <script src="https://cdn.jsdelivr.net"></script>
 </head>
 <body>
@@ -13,13 +13,15 @@
 <div class="container">
     <header>
         <h1>Macro-Investment SQL Lab</h1>
-        <div id="status-indicator">SYSTEM READY // SYNCING WORLD BANK API...</div>
+        <!-- Target for updateStatus() -->
+        <div id="status-indicator">SYSTEM INITIALIZING...</div>
     </header>
 
     <!-- Analytical Scenarios for HR -->
     <div class="panel" style="border-color: #FF9900; margin-bottom: 20px;">
         <div class="panel-header">Analytical Scenarios (Select to Execute SQL)</div>
         <div class="controls" id="scenario-controls">
+            <!-- These call window.runScenario defined in app.js -->
             <button onclick="runScenario('growth')">1. Liquidity Growth (LAG)</button>
             <button onclick="runScenario('volatility')">2. Risk Volatility (STDDEV)</button>
             <button onclick="runScenario('smoothing')">3. Trend Smoothing (AVG OVER)</button>
@@ -30,13 +32,15 @@
     <div class="dashboard-grid">
         <section class="panel">
             <div class="panel-header">Global Liquidity Visualization</div>
-            <div class="chart-wrap">
+            <div class="chart-wrap" style="position: relative; height: 350px; width: 100%;">
+                <!-- Target for Chart.js -->
                 <canvas id="main-chart"></canvas>
             </div>
         </section>
 
         <section class="panel">
             <div class="panel-header">Strategic Business Insight</div>
+            <!-- Target for insight-box updates -->
             <div id="insight-box" class="business-insight">
                 Initializing engine... Select a scenario above to demonstrate how <strong>SQL Logic</strong> translates raw macroeconomic data into <strong>Investment Strategy</strong>.
             </div>
@@ -47,16 +51,18 @@
     <div class="dashboard-grid">
         <section class="panel">
             <div class="panel-header">Executed SQL Query (DuckDB WASM)</div>
-            <div id="sql-display">-- SQL Code will appear here...</div>
+            <!-- Target for SQL text injection -->
+            <pre id="sql-display" style="margin: 0; white-space: pre-wrap; font-family: monospace; color: #00FF00;"></pre>
         </section>
 
         <section class="panel">
             <div class="panel-header">Processed Result Set</div>
             <div class="table-wrap">
                 <table id="resultsTable">
-                    <thead><tr id="table-head"><th>DATE</th><th>VALUE</th></tr></thead>
+                    <!-- Targets for dynamic table generation -->
+                    <thead id="table-head"></thead>
                     <tbody id="table-body">
-                        <tr><td colspan="2">Awaiting execution...</td></tr>
+                        <tr><td colspan="2" style="text-align: center; padding: 20px;">Awaiting analytical engine...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -71,6 +77,7 @@
     </footer>
 </div>
 
+<!-- Main analytical logic -->
 <script type="module" src="app.js"></script>
 
 </body>
