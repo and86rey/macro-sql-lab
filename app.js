@@ -1,7 +1,6 @@
 // app.js (type="module")
 
-// DuckDB-WASM via jsDelivr ESM bundle
-import * as duckdb from "https://cdn.jsdelivr.net/npm/@duckdb/duckdb-wasm@1.30.0/+esm"; // version can be adjusted [web:2][web:8]
+import * as duckdb from "https://cdn.jsdelivr.net/npm/@duckdb/duckdb-wasm@1.30.0/+esm";
 
 /**
  * CONFIGURATION: SQL Scenarios with Business Analytics Logic
@@ -81,11 +80,32 @@ const SCENARIOS = {
 let db, conn, chart;
 
 /**
- * World Bank API: Robust Pagination
- * indicator: e.g. "FM.LBL.MQMY.GD.ZS"
- * country:   e.g. "EMU"
+ * Known-good indicator/country for MVP
+ * - NY.GDP.PCAP.KD: GDP per capita (constant 2015 US$) [web:68]
+ * - DEU: Germany [web:65]
  */
+const WB_INDICATOR = "NY.GDP.PCAP.KD";
+const WB_COUNTRY = "DEU";
 
+/**
+ * Tiny built-in fallback dataset (if World Bank API yields 0 observations)
+ */
+const FALLBACK_OBSERVATIONS = [
+  { date: 2014, value: 45000 },
+  { date: 2015, value: 46000 },
+  { date: 2016, value: 47000 },
+  { date: 2017, value: 48000 },
+  { date: 2018, value: 49000 },
+  { date: 2019, value: 50000 },
+  { date: 2020, value: 49500 },
+  { date: 2021, value: 51000 },
+  { date: 2022, value: 52000 },
+  { date: 2023, value: 53000 }
+];
+
+/**
+ * World Bank API: Robust Pagination + error handling
+ */
 async function fetchAllWorldBankData(indicator, country) {
   let allData = [];
   let page = 1;
@@ -94,15 +114,28 @@ async function fetchAllWorldBankData(indicator, country) {
   try {
     do {
       const url = `https://api.worldbank.org/v2/country/${country}/indicator/${indicator}?format=json&page=${page}&per_page=100`;
-      console.log("WB URL:", url); // DEBUG
+      console.log("WB URL:", url);
 
       const response = await fetch(url);
-      console.log("WB status:", response.status); // DEBUG
+      console.log("WB status:", response.status);
 
       const json = await response.json();
-      console.log("WB JSON page", page, ":", json); // DEBUG
+      console.log("WB raw JSON page", page, ":", json);
 
-      if (!json || !Array.isArray(json) || !json[1]) {
+      if (!Array.isArray(json)) {
+        console.warn("WB: unexpected JSON shape (not array)");
+        break;
+      }
+
+      // Error payload: [ { message: [...] } ]
+      if (json.length === 1 && json[0] && json[0].message) {
+        console.warn("WB error payload:", json[0].message);
+        break;
+      }
+
+      // Normal expected case: [meta, dataArray]
+      if (!json[1] || !Array.isArray(json[1])) {
+        console.warn("WB: no data array in json[1]");
         break;
       }
 
@@ -124,18 +157,19 @@ async function fetchAllWorldBankData(indicator, country) {
     } while (page <= totalPages);
   } catch (err) {
     console.error("World Bank error:", err);
-    throw new Error(`World Bank API unreachable: ${err.message}`);
+    // We don't rethrow here; we let fallback handle it.
   }
 
-  console.log("Total observations:", allData.length); // DEBUG
+  allData.sort((a, b) => a.date - b.date);
+  console.log("Total observations from WB:", allData.length);
   return allData;
 }
 
 /**
- * DuckDB-WASM: Standard ESM Instantiation via jsDelivr
+ * DuckDB-WASM init
  */
 async function initDuckDB() {
-  const JSDELIVR_BUNDLES = duckdb.getJsDelivrBundles(); // [web:5][web:10]
+  const JSDELIVR_BUNDLES = duckdb.getJsDelivrBundles();
   const bundle = await duckdb.selectBundle(JSDELIVR_BUNDLES);
 
   const worker_url = URL.createObjectURL(
@@ -155,32 +189,29 @@ async function initDuckDB() {
 }
 
 /**
- * Initialization flow:
- * 1. Fetch macro data from World Bank
- * 2. Boot DuckDB-WASM
- * 3. Load data into DuckDB
- * 4. Run default scenario
+ * Initialization flow
  */
 async function init() {
   try {
     updateStatus("FETCHING WORLD BANK DATA...");
 
-    // EMU: Euro area aggregate, indicator: Money & quasi money (% of GDP) [web:38]
-    const observations = await fetchAllWorldBankData(
-  "FM.LBL.BMNY.GD.ZS",
-  "DEU"
+    let observations = await fetchAllWorldBankData(
+      WB_INDICATOR,
+      WB_COUNTRY
     );
+
     if (!observations || observations.length === 0) {
-      updateStatus("EMPTY DATASET: NO OBSERVATIONS FOUND");
-      console.warn("No observations returned from World Bank");
-      return;
+      console.warn("No observations from World Bank. Using fallback data.");
+      observations = FALLBACK_OBSERVATIONS;
+      updateStatus("USING FALLBACK DATASET (DEMO MODE)");
+    } else {
+      updateStatus("WORLD BANK DATA LOADED");
     }
 
-    updateStatus("BOOTING DUCKDB-WASM...");
     db = await initDuckDB();
     conn = await db.connect();
 
-    updateStatus("INGESTING DATA...");
+    updateStatus("INGESTING DATA INTO DUCKDB...");
     const fileName = "macro.json";
     await db.registerFileText(fileName, JSON.stringify(observations));
 
@@ -191,7 +222,7 @@ async function init() {
       FROM read_json_auto('${fileName}');
     `);
 
-    // Attach scenario runner to window for HTML buttons
+    // Always define runScenario so buttons work
     window.runScenario = async id => {
       if (!SCENARIOS[id]) {
         console.warn(`Invalid Scenario: ${id}`);
@@ -319,4 +350,5 @@ function updateDOM(id, content) {
 }
 
 // Kick off
+updateStatus("SYSTEM INITIALIZING...");
 init();
