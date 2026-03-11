@@ -80,9 +80,9 @@ const SCENARIOS = {
 let db, conn, chart;
 
 /**
- * Known-good indicator/country for MVP
- * - NY.GDP.PCAP.KD: GDP per capita (constant 2015 US$) [web:68]
- * - DEU: Germany [web:65]
+ * Primary World Bank data config for MVP:
+ * - Indicator: NY.GDP.PCAP.KD  (GDP per capita, constant 2015 US$) [web:72][web:84]
+ * - Country:   DEU             (Germany) [web:65]
  */
 const WB_INDICATOR = "NY.GDP.PCAP.KD";
 const WB_COUNTRY = "DEU";
@@ -127,13 +127,13 @@ async function fetchAllWorldBankData(indicator, country) {
         break;
       }
 
-      // Error payload: [ { message: [...] } ]
+      // Error payload: [ { message: [...] } ] [web:69]
       if (json.length === 1 && json[0] && json[0].message) {
         console.warn("WB error payload:", json[0].message);
         break;
       }
 
-      // Normal expected case: [meta, dataArray]
+      // Normal expected case: [meta, dataArray] [web:31]
       if (!json[1] || !Array.isArray(json[1])) {
         console.warn("WB: no data array in json[1]");
         break;
@@ -157,7 +157,7 @@ async function fetchAllWorldBankData(indicator, country) {
     } while (page <= totalPages);
   } catch (err) {
     console.error("World Bank error:", err);
-    // We don't rethrow here; we let fallback handle it.
+    // We don't rethrow here; fallback handles it.
   }
 
   allData.sort((a, b) => a.date - b.date);
@@ -204,8 +204,14 @@ async function init() {
       console.warn("No observations from World Bank. Using fallback data.");
       observations = FALLBACK_OBSERVATIONS;
       updateStatus("USING FALLBACK DATASET (DEMO MODE)");
+      updateDataModeBanner(
+        "Data mode: DEMO (built‑in sample series; World Bank API not available in this session)."
+      );
     } else {
       updateStatus("WORLD BANK DATA LOADED");
+      updateDataModeBanner(
+        "Data mode: LIVE World Bank API (GDP per capita, constant 2015 US$, Germany)."
+      );
     }
 
     db = await initDuckDB();
@@ -347,6 +353,12 @@ function updateStatus(msg) {
 function updateDOM(id, content) {
   const el = document.getElementById(id);
   if (el) el.innerHTML = content;
+}
+
+function updateDataModeBanner(modeText) {
+  const el = document.getElementById("data-mode-banner");
+  if (!el) return;
+  el.textContent = modeText;
 }
 
 // Kick off
