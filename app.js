@@ -167,10 +167,9 @@ async function init() {
 
     // EMU: Euro area aggregate, indicator: Money & quasi money (% of GDP) [web:38]
     const observations = await fetchAllWorldBankData(
-      "FM.LBL.MQMY.GD.ZS",
-      "EMU"
+  "FM.LBL.BMNY.GD.ZS",
+  "DEU"
     );
-
     if (!observations || observations.length === 0) {
       updateStatus("EMPTY DATASET: NO OBSERVATIONS FOUND");
       console.warn("No observations returned from World Bank");
