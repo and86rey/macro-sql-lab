@@ -1,0 +1,150 @@
+/* Bloomberg Terminal Professional Aesthetic */
+:root {
+    --bg-black: #000000;
+    --terminal-orange: #FF9900; /* Standard Bloomberg Orange */
+    --terminal-green: #00FF00;  /* Matrix/Code Green */
+    --border-gray: #333333;
+    --panel-bg: #050505;
+    --text-muted: #888888;
+}
+
+body {
+    background-color: var(--bg-black);
+    color: var(--terminal-orange);
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace; /* Professional fixed-width */
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Header / Title Bar */
+header {
+    border-bottom: 2px solid var(--terminal-orange);
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+}
+
+h1 {
+    font-size: 22px;
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+/* Dashboard Grid */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 1.4fr 0.6fr;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.panel {
+    background: var(--panel-bg);
+    border: 1px solid var(--border-gray);
+    padding: 15px;
+    position: relative;
+}
+
+.panel-header {
+    font-size: 12px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    border-bottom: 1px solid var(--border-gray);
+    padding-bottom: 5px;
+}
+
+/* SQL & Logic Display */
+#sql-display {
+    background: #020202;
+    color: var(--terminal-green);
+    padding: 15px;
+    font-size: 13px;
+    white-space: pre-wrap;
+    border: 1px solid var(--border-gray);
+    min-height: 180px;
+}
+
+.business-insight {
+    font-size: 14px;
+    line-height: 1.6;
+    color: #FFFFFF; /* High contrast white for readability */
+}
+
+.business-insight strong {
+    color: var(--terminal-orange);
+}
+
+/* Scenario Buttons */
+.controls {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+button {
+    background: var(--bg-black);
+    border: 1px solid var(--terminal-orange);
+    color: var(--terminal-orange);
+    padding: 8px 16px;
+    cursor: pointer;
+    font-family: inherit;
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 11px;
+}
+
+button:hover, button.active {
+    background: var(--terminal-orange);
+    color: var(--bg-black);
+}
+
+/* Data Elements */
+.chart-wrap {
+    height: 350px;
+    width: 100%;
+}
+
+.table-wrap {
+    overflow-x: auto;
+    max-height: 250px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    text-align: left;
+}
+
+th {
+    color: var(--bg-black);
+    background: var(--terminal-orange);
+    padding: 6px;
+}
+
+td {
+    border-bottom: 1px solid var(--border-gray);
+    padding: 6px;
+    color: #BBBBBB;
+}
+
+/* Status Indicator */
+#status-indicator {
+    font-size: 11px;
+    color: var(--terminal-green);
+}
+
+@media (max-width: 900px) {
+    .dashboard-grid { grid-template-columns: 1fr; }
+}
