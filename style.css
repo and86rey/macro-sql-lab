@@ -1,8 +1,7 @@
-/* Bloomberg Terminal Professional Aesthetic */
 :root {
     --bg-black: #000000;
-    --terminal-orange: #FF9900; /* Standard Bloomberg Orange */
-    --terminal-green: #00FF00;  /* Matrix/Code Green */
+    --terminal-orange: #FF9900; 
+    --terminal-green: #00FF00;  
     --border-gray: #333333;
     --panel-bg: #050505;
     --text-muted: #888888;
@@ -11,7 +10,7 @@
 body {
     background-color: var(--bg-black);
     color: var(--terminal-orange);
-    font-family: 'Consolas', 'Monaco', 'Courier New', monospace; /* Professional fixed-width */
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace; 
     margin: 0;
     padding: 0;
     overflow-x: hidden;
@@ -78,7 +77,7 @@ h1 {
 .business-insight {
     font-size: 14px;
     line-height: 1.6;
-    color: #FFFFFF; /* High contrast white for readability */
+    color: #FFFFFF; 
 }
 
 .business-insight strong {
