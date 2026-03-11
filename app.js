@@ -81,11 +81,10 @@ let db, conn, chart;
 
 /**
  * Primary World Bank data config for MVP:
- * - Indicator: NY.GDP.PCAP.KD  (GDP per capita, constant 2015 US$) [web:72][web:84]
- * - Country:   DEU             (Germany) [web:65]
+ * - Country:   EMU
  */
-const WB_INDICATOR = "NY.GDP.PCAP.KD";
-const WB_COUNTRY = "DEU";
+const WB_INDICATOR = "FM.LBL.BMNY.GD.ZS";
+const WB_COUNTRY = "EMU";
 
 /**
  * Tiny built-in fallback dataset (if World Bank API yields 0 observations)
@@ -210,7 +209,7 @@ async function init() {
     } else {
       updateStatus("WORLD BANK DATA LOADED");
       updateDataModeBanner(
-        "Data mode: LIVE World Bank API (GDP per capita, constant 2015 US$, Germany)."
+        "Data mode: LIVE World Bank API (Broad money % of GDP, Euro area)."
       );
     }
 
