@@ -30,6 +30,7 @@
         <label for="country-select">Country:&nbsp;</label>
         <select id="country-select">
           <!-- These ISO codes are all valid in the World Bank API  -->
+          <option value="">Select country…</option>
           <option value="DEU">Germany (DEU)</option>
           <option value="FRA">France (FRA)</option>
           <option value="USA">United States (USA)</option>
@@ -40,7 +41,8 @@
 
         <label for="indicator-select">Indicator:&nbsp;</label>
         <select id="indicator-select">
-          <!-- All two indicators are actively maintained in WDI -->
+          <!-- Two robust GDP indicators -->
+          <option value="">Select indicator…</option>
           <option value="NY.GDP.PCAP.KD">
             GDP per capita (constant 2015 US$)
           </option>
@@ -68,7 +70,8 @@
     <!-- Visuals & Business Insights -->
     <div class="dashboard-grid">
       <section class="panel">
-        <div class="panel-header">Global Liquidity Visualization</div>
+        <!-- Renamed: no more "Global Liquidity" -->
+        <div class="panel-header">Macro Indicator Visualization</div>
         <div class="chart-wrap" style="position: relative; height: 350px; width: 100%;">
           <canvas id="main-chart"></canvas>
         </div>
@@ -123,7 +126,7 @@
         </p>
         <p>
           Example indicators include <strong>GDP per capita (constant 2015 US$)</strong>
-          (<code>NY.GDP.PCAP.KD</code>), and <strong>real GDP growth (annual %)</strong>
+          (<code>NY.GDP.PCAP.KD</code>) and <strong>real GDP growth (annual %)</strong>
           (<code>NY.GDP.MKTP.KD.ZG</code>). These are widely used macro series in investment
           and policy analysis.
         </p>
