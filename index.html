@@ -29,7 +29,7 @@
       <div class="panel-body">
         <label for="country-select">Country:&nbsp;</label>
         <select id="country-select">
-          <!-- These ISO codes are all valid in the World Bank API [web:31][web:88] -->
+          <!-- These ISO codes are all valid in the World Bank API  -->
           <option value="DEU">Germany (DEU)</option>
           <option value="FRA">France (FRA)</option>
           <option value="USA">United States (USA)</option>
@@ -40,7 +40,7 @@
 
         <label for="indicator-select">Indicator:&nbsp;</label>
         <select id="indicator-select">
-          <!-- All three indicators are actively maintained in WDI [web:62][web:72][web:85] -->
+          <!-- All three indicators are actively maintained in WDI -->
           <option value="FM.LBL.BMNY.ZG">
             Broad money growth (annual %)
           </option>
@@ -122,14 +122,14 @@
           Use the selectors above to choose a <strong>country</strong> and a
           <strong>World Bank indicator</strong>. The app then pulls annual time series through
           the official World Bank <strong>Indicators API</strong> and loads them into a local
-          DuckDB-WASM database in your browser. [web:31][web:30]
+          DuckDB-WASM database in your browser.
         </p>
         <p>
           Example indicators include <strong>broad money growth (annual %)</strong>
           (<code>FM.LBL.BMNY.ZG</code>), <strong>GDP per capita (constant 2015 US$)</strong>
           (<code>NY.GDP.PCAP.KD</code>), and <strong>real GDP growth (annual %)</strong>
           (<code>NY.GDP.MKTP.KD.ZG</code>). These are widely used macro series in investment
-          and policy analysis. [web:62][web:72][web:85]
+          and policy analysis.
         </p>
       </div>
     </section>
@@ -141,7 +141,7 @@
           A lightweight <strong>DuckDB-WASM</strong> database runs inside your browser.
           Once the World Bank series is loaded as a table, SQL window functions like
           <code>LAG</code>, <code>AVG</code>, and <code>STDDEV_SAMP</code> compute growth,
-          volatility, and moving averages in real time. [web:80][web:25]
+          volatility, and moving averages in real time.
         </p>
         <p>
           Each scenario executes a different SQL query against the same dataset, then updates the
@@ -162,7 +162,7 @@
       "
     >
       <div>
-        SOURCE: WORLD BANK OPEN DATA (WORLD DEVELOPMENT INDICATORS) // PROCESSED VIA DUCKDB-WASM [web:30][web:31]
+        SOURCE: WORLD BANK OPEN DATA (WORLD DEVELOPMENT INDICATORS) // PROCESSED VIA DUCKDB-WASM
       </div>
       <div style="margin-top: 10px;">
         BUILD BY
