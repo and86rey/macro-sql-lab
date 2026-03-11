@@ -1,62 +1,14 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Macro-Investment SQL Lab | Andrey Zakharov</title>
-  <link rel="stylesheet" href="style.css" />
-
-  <!-- Chart.js (must load before app.js so global Chart is defined) -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js/dist/chart.umd.min.js"></script>
-</head>
 <body>
   <div class="container">
     <header>
       <h1>Macro-Investment SQL Lab</h1>
 
-      <!-- High-level status + data mode info -->
+      <!-- Status + data mode info -->
       <div id="status-indicator">SYSTEM INITIALIZING...</div>
       <div id="data-mode-banner" class="data-mode-banner">
-        Loading data source description…
+        Detecting data mode…
       </div>
     </header>
-
-    <!-- New: What data is this? -->
-    <section class="panel" style="border-color:#4CAF50; margin-bottom: 20px;">
-      <div class="panel-header">Data Source & Coverage</div>
-      <div class="panel-body">
-        <p>
-          This lab uses annual <strong>GDP per capita (constant 2015 US$)</strong> from the
-          <strong>World Bank</strong> for <strong>Germany (DEU)</strong>. The indicator code is
-          <code>NY.GDP.PCAP.KD</code>. It measures economic output per person, adjusted for
-          inflation, and is widely used to track living standards over time. [web:72]
-        </p>
-        <p>
-          If the live World Bank API is not reachable from your browser, the lab automatically
-          switches to a small built‑in demo series with similar behavior so that all scenarios
-          still run and visualize correctly.
-        </p>
-      </div>
-    </section>
-
-    <!-- New: How this lab works -->
-    <section class="panel" style="border-color:#0099FF; margin-bottom: 20px;">
-      <div class="panel-header">How This Lab Works</div>
-      <div class="panel-body">
-        <p>
-          A lightweight <strong>DuckDB-WASM</strong> database runs entirely inside your browser
-          (no server, no backend). The lab loads macroeconomic time series into DuckDB and then
-          executes analytical <strong>SQL</strong> scenarios to compute growth, volatility, and
-          moving averages. [web:80][web:25]
-        </p>
-        <p>
-          Each scenario uses a different window function (such as <code>LAG</code>,
-          <code>AVG</code>, or <code>STDDEV_SAMP</code>) and immediately updates the chart,
-          insight text, and result table so you can see how changes in SQL logic alter the
-          investment story.
-        </p>
-      </div>
-    </section>
 
     <!-- Analytical Scenarios -->
     <div class="panel" style="border-color: #FF9900; margin-bottom: 20px;">
@@ -114,6 +66,42 @@
       </section>
     </div>
 
+    <!-- Explanations moved to bottom -->
+    <section class="panel" style="border-color:#4CAF50; margin-top: 30px;">
+      <div class="panel-header">About the Data</div>
+      <div class="panel-body">
+        <p>
+          This lab uses annual <strong>broad money as a percentage of GDP</strong> for the
+          <strong>Euro area (EMU)</strong>, sourced from the <strong>World Bank Open Data</strong>
+          indicator <code>FM.LBL.BMNY.GD.ZS</code>. It measures how large the monetary aggregate
+          is relative to the size of the economy. [web:35][web:36][web:31]
+        </p>
+        <p>
+          When the World Bank API is not reachable from your browser or this indicator is
+          unavailable, the lab switches to a small built‑in demo series so all scenarios still
+          run and visualize correctly. The banner above the chart tells you whether you are
+          seeing <strong>LIVE</strong> World Bank data or <strong>DEMO</strong> fallback.
+        </p>
+      </div>
+    </section>
+
+    <section class="panel" style="border-color:#0099FF; margin-top: 20px;">
+      <div class="panel-header">How This Lab Works</div>
+      <div class="panel-body">
+        <p>
+          A lightweight <strong>DuckDB-WASM</strong> database runs inside your browser, and the
+          World Bank time series is loaded into it as a table. SQL window functions like
+          <code>LAG</code>, <code>AVG</code>, and <code>STDDEV_SAMP</code> compute growth,
+          volatility, and moving averages on the fly. [web:80][web:25]
+        </p>
+        <p>
+          Each scenario executes a different SQL query against the same dataset, then updates the
+          chart, insight text, and result table so you can see how analytical logic turns raw
+          macro data into an investment narrative.
+        </p>
+      </div>
+    </section>
+
     <footer
       style="
         text-align: center;
@@ -125,7 +113,7 @@
       "
     >
       <div>
-        SOURCE: WORLD BANK OPEN DATA (GDP PER CAPITA, CONSTANT 2015 US$) // PROCESSED VIA DUCKDB-WASM [web:72]
+        SOURCE: WORLD BANK OPEN DATA (BROAD MONEY % OF GDP, EURO AREA) // PROCESSED VIA DUCKDB-WASM [web:35][web:36]
       </div>
       <div style="margin-top: 10px;">
         BUILD BY
@@ -142,4 +130,3 @@
   <!-- Main analytical logic -->
   <script type="module" src="app.js"></script>
 </body>
-</html>
