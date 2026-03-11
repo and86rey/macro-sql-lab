@@ -1,84 +1,100 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Macro-Investment SQL Lab | Andrey Zakharov</title>
-    <link rel="stylesheet" href="style.css">
-    <!-- Chart.js from jsDelivr -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js/dist/chart.umd.min.js"></script> <!-- v4+ style URL [web:17][web:21][web:23] -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Macro-Investment SQL Lab | Andrey Zakharov</title>
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- Chart.js (must load before app.js so global Chart is defined) -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js/dist/chart.umd.min.js"></script> <!-- [web:17][web:21] -->
 </head>
 <body>
-
-<div class="container">
+  <div class="container">
     <header>
-        <h1>Macro-Investment SQL Lab</h1>
-        <!-- Target for updateStatus() -->
-        <div id="status-indicator">SYSTEM INITIALIZING...</div>
+      <h1>Macro-Investment SQL Lab</h1>
+      <div id="status-indicator">SYSTEM INITIALIZING...</div>
     </header>
 
-    <!-- Analytical Scenarios for HR -->
     <div class="panel" style="border-color: #FF9900; margin-bottom: 20px;">
-        <div class="panel-header">Analytical Scenarios (Select to Execute SQL)</div>
-        <div class="controls" id="scenario-controls">
-            <!-- These call window.runScenario defined in app.js -->
-            <button onclick="runScenario('growth')">1. Liquidity Growth (LAG)</button>
-            <button onclick="runScenario('volatility')">2. Risk Volatility (STDDEV)</button>
-            <button onclick="runScenario('smoothing')">3. Trend Smoothing (AVG OVER)</button>
-        </div>
+      <div class="panel-header">Analytical Scenarios (Select to Execute SQL)</div>
+      <div class="controls" id="scenario-controls">
+        <button onclick="runScenario('growth')">1. Liquidity Growth (LAG)</button>
+        <button onclick="runScenario('volatility')">2. Risk Volatility (STDDEV)</button>
+        <button onclick="runScenario('smoothing')">3. Trend Smoothing (AVG OVER)</button>
+      </div>
     </div>
 
-    <!-- Visuals & Business Insights -->
     <div class="dashboard-grid">
-        <section class="panel">
-            <div class="panel-header">Global Liquidity Visualization</div>
-            <div class="chart-wrap" style="position: relative; height: 350px; width: 100%;">
-                <!-- Target for Chart.js -->
-                <canvas id="main-chart"></canvas>
-            </div>
-        </section>
-
-        <section class="panel">
-            <div class="panel-header">Strategic Business Insight</div>
-            <!-- Target for insight-box updates -->
-            <div id="insight-box" class="business-insight">
-                Initializing engine... Select a scenario above to demonstrate how <strong>SQL Logic</strong> translates raw macroeconomic data into <strong>Investment Strategy</strong>.
-            </div>
-        </section>
-    </div>
-
-    <!-- Technical Proof (The SQL) -->
-    <div class="dashboard-grid">
-        <section class="panel">
-            <div class="panel-header">Executed SQL Query (DuckDB WASM)</div>
-            <!-- Target for SQL text injection -->
-            <pre id="sql-display" style="margin: 0; white-space: pre-wrap; font-family: monospace; color: #00FF00;"></pre>
-        </section>
-
-        <section class="panel">
-            <div class="panel-header">Processed Result Set</div>
-            <div class="table-wrap">
-                <table id="resultsTable">
-                    <!-- Targets for dynamic table generation -->
-                    <thead id="table-head"></thead>
-                    <tbody id="table-body">
-                        <tr><td colspan="2" style="text-align: center; padding: 20px;">Awaiting analytical engine...</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </section>
-    </div>
-
-    <footer style="text-align: center; color: #666; font-size: 11px; margin-top: 40px; border-top: 1px solid #333; padding-top: 20px;">
-        <div>SOURCE: WORLD BANK OPEN DATA (BROAD MONEY % OF GDP) // PROCESSED VIA DUCKDB-WASM</div>
-        <div style="margin-top: 10px;">
-            BUILD BY <a href="https://www.linkedin.com/in/zakharovaa/" target="_blank" style="color: #FF9900; text-decoration: none; font-weight: bold;">ANDREY ZAKHAROV</a>
+      <section class="panel">
+        <div class="panel-header">Global Liquidity Visualization</div>
+        <div class="chart-wrap" style="position: relative; height: 350px; width: 100%;">
+          <canvas id="main-chart"></canvas>
         </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-header">Strategic Business Insight</div>
+        <div id="insight-box" class="business-insight">
+          Initializing engine... Select a scenario above to demonstrate how
+          <strong>SQL Logic</strong> translates raw macroeconomic data into
+          <strong>Investment Strategy</strong>.
+        </div>
+      </section>
+    </div>
+
+    <div class="dashboard-grid">
+      <section class="panel">
+        <div class="panel-header">Executed SQL Query (DuckDB WASM)</div>
+        <pre
+          id="sql-display"
+          style="margin: 0; white-space: pre-wrap; font-family: monospace; color: #00FF00;"
+        ></pre>
+      </section>
+
+      <section class="panel">
+        <div class="panel-header">Processed Result Set</div>
+        <div class="table-wrap">
+          <table id="resultsTable">
+            <thead id="table-head"></thead>
+            <tbody id="table-body">
+              <tr>
+                <td colspan="2" style="text-align: center; padding: 20px;">
+                  Awaiting analytical engine...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+
+    <footer
+      style="
+        text-align: center;
+        color: #666;
+        font-size: 11px;
+        margin-top: 40px;
+        border-top: 1px solid #333;
+        padding-top: 20px;
+      "
+    >
+      <div>
+        SOURCE: WORLD BANK OPEN DATA (BROAD MONEY % OF GDP) // PROCESSED VIA DUCKDB-WASM
+      </div>
+      <div style="margin-top: 10px;">
+        BUILD BY
+        <a
+          href="https://www.linkedin.com/in/zakharovaa/"
+          target="_blank"
+          style="color: #FF9900; text-decoration: none; font-weight: bold;"
+          >ANDREY ZAKHAROV</a
+        >
+      </div>
     </footer>
-</div>
+  </div>
 
-<!-- Main analytical logic -->
-<script type="module" src="app.js"></script>
-
+  <!-- Main analytical logic (production-ready app.js from previous message) -->
+  <script type="module" src="app.js"></script>
 </body>
 </html>
