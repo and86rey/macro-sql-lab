@@ -1,4 +1,4 @@
-// app.js (type="module")
+// app.js (type="module") — LIVE World Bank data, user-selectable country & indicator, no auto-load
 
 import * as duckdb from "https://cdn.jsdelivr.net/npm/@duckdb/duckdb-wasm@1.30.0/+esm";
 
@@ -21,7 +21,7 @@ const SCENARIOS = {
       ORDER BY date DESC;
     `,
     insight:
-      "<strong>Scenario: Liquidity Momentum.</strong> Calculates YoY growth using <code>LAG</code>. High growth indicates increasing monetary supply relative to GDP.",
+      "<strong>Scenario: Liquidity Momentum.</strong> Calculates YoY growth using <code>LAG</code>. High growth indicates accelerating macro momentum versus the previous year.",
     kpis: [{ col: "growth_pct", label: "YoY Growth %" }]
   },
   volatility: {
@@ -45,7 +45,7 @@ const SCENARIOS = {
       ORDER BY date DESC;
     `,
     insight:
-      "<strong>Scenario: Risk Volatility.</strong> Uses <code>STDDEV_SAMP</code> over a 5-period window to detect regime shifts in monetary stability.",
+      "<strong>Scenario: Risk Volatility.</strong> Uses <code>STDDEV_SAMP</code> over a 5-period window to detect changes in macro stability.",
     kpis: [{ col: "rolling_stddev", label: "5Y Rolling Volatility" }]
   },
   smoothing: {
@@ -69,7 +69,7 @@ const SCENARIOS = {
       ORDER BY date DESC;
     `,
     insight:
-      "<strong>Scenario: Trend Convergence.</strong> Compares 5-year (Short) vs 10-year (Long) Moving Averages to identify structural trends.",
+      "<strong>Scenario: Trend Convergence.</strong> Compares 5-year (Short) vs 10-year (Long) moving averages to highlight structural trend shifts.",
     kpis: [
       { col: "short_term_ma", label: "5Y Short-Term MA" },
       { col: "long_term_ma", label: "10Y Long-Term MA" }
@@ -78,29 +78,6 @@ const SCENARIOS = {
 };
 
 let db, conn, chart;
-
-/**
- * Primary World Bank data config for MVP:
- * - Country:   EMU
- */
-const WB_INDICATOR = "FM.LBL.BMNY.GD.ZS";
-const WB_COUNTRY = "EMU";
-
-/**
- * Tiny built-in fallback dataset (if World Bank API yields 0 observations)
- */
-const FALLBACK_OBSERVATIONS = [
-  { date: 2014, value: 45000 },
-  { date: 2015, value: 46000 },
-  { date: 2016, value: 47000 },
-  { date: 2017, value: 48000 },
-  { date: 2018, value: 49000 },
-  { date: 2019, value: 50000 },
-  { date: 2020, value: 49500 },
-  { date: 2021, value: 51000 },
-  { date: 2022, value: 52000 },
-  { date: 2023, value: 53000 }
-];
 
 /**
  * World Bank API: Robust Pagination + error handling
@@ -118,21 +95,26 @@ async function fetchAllWorldBankData(indicator, country) {
       const response = await fetch(url);
       console.log("WB status:", response.status);
 
+      if (!response.ok) {
+        console.warn("WB HTTP error:", response.status, response.statusText);
+        break;
+      }
+
       const json = await response.json();
-      console.log("WB raw JSON page", page, ":", json);
+      console.log("WB raw JSON page", page, ":", JSON.stringify(json));
 
       if (!Array.isArray(json)) {
         console.warn("WB: unexpected JSON shape (not array)");
         break;
       }
 
-      // Error payload: [ { message: [...] } ] [web:69]
+      // Error payload: [ { message: [...] } ]
       if (json.length === 1 && json[0] && json[0].message) {
         console.warn("WB error payload:", json[0].message);
         break;
       }
 
-      // Normal expected case: [meta, dataArray] [web:31]
+      // Normal expected case: [meta, dataArray]
       if (!json[1] || !Array.isArray(json[1])) {
         console.warn("WB: no data array in json[1]");
         break;
@@ -156,7 +138,6 @@ async function fetchAllWorldBankData(indicator, country) {
     } while (page <= totalPages);
   } catch (err) {
     console.error("World Bank error:", err);
-    // We don't rethrow here; fallback handles it.
   }
 
   allData.sort((a, b) => a.date - b.date);
@@ -188,46 +169,56 @@ async function initDuckDB() {
 }
 
 /**
- * Initialization flow
+ * Load live World Bank data into DuckDB for the given indicator/country.
+ * Returns true if data loaded, false if no data.
+ */
+async function loadDataAndPrepare(indicator, country) {
+  updateStatus(`FETCHING WORLD BANK DATA (${country}, ${indicator})...`);
+
+  const observations = await fetchAllWorldBankData(indicator, country);
+
+  if (!observations || observations.length === 0) {
+    console.error("No observations from World Bank for", country, indicator);
+    updateStatus("ERROR: NO WORLD BANK DATA FOR THIS SELECTION");
+    updateDataModeBanner(
+      `Data mode: ERROR (no World Bank data for ${country}/${indicator}; please try a different combination).`
+    );
+    // Clear chart and table
+    renderChart([], []);
+    renderTable([]);
+    return false;
+  }
+
+  updateStatus("WORLD BANK DATA LOADED");
+  updateDataModeBanner(
+    `Data mode: LIVE World Bank API (${indicator}, ${country}).`
+  );
+
+  if (!db) {
+    db = await initDuckDB();
+    conn = await db.connect();
+  }
+
+  const fileName = "macro.json";
+  await db.registerFileText(fileName, JSON.stringify(observations));
+
+  await conn.query(`
+    DROP TABLE IF EXISTS macro_data;
+    CREATE TABLE macro_data (date INTEGER, value DOUBLE);
+    INSERT INTO macro_data (date, value)
+    SELECT date::INTEGER, value::DOUBLE
+    FROM read_json_auto('${fileName}');
+  `);
+
+  return true;
+}
+
+/**
+ * Main initialization — no default load, waits for user selection
  */
 async function init() {
   try {
-    updateStatus("FETCHING WORLD BANK DATA...");
-
-    let observations = await fetchAllWorldBankData(
-      WB_INDICATOR,
-      WB_COUNTRY
-    );
-
-    if (!observations || observations.length === 0) {
-      console.warn("No observations from World Bank. Using fallback data.");
-      observations = FALLBACK_OBSERVATIONS;
-      updateStatus("USING FALLBACK DATASET (DEMO MODE)");
-      updateDataModeBanner(
-        "Data mode: DEMO (built‑in sample series; World Bank API not available in this session)."
-      );
-    } else {
-      updateStatus("WORLD BANK DATA LOADED");
-      updateDataModeBanner(
-        "Data mode: LIVE World Bank API (Broad money % of GDP, Euro area)."
-      );
-    }
-
-    db = await initDuckDB();
-    conn = await db.connect();
-
-    updateStatus("INGESTING DATA INTO DUCKDB...");
-    const fileName = "macro.json";
-    await db.registerFileText(fileName, JSON.stringify(observations));
-
-    await conn.query(`
-      CREATE TABLE macro_data (date INTEGER, value DOUBLE);
-      INSERT INTO macro_data (date, value)
-      SELECT date::INTEGER, value::DOUBLE
-      FROM read_json_auto('${fileName}');
-    `);
-
-    // Always define runScenario so buttons work
+    // Attach scenario runner to window
     window.runScenario = async id => {
       if (!SCENARIOS[id]) {
         console.warn(`Invalid Scenario: ${id}`);
@@ -254,8 +245,32 @@ async function init() {
       }
     };
 
-    // Auto-run default scenario
-    await window.runScenario("growth");
+    // Wire up "Load data" button for user-selected country/indicator
+    const loadBtn = document.getElementById("load-data-btn");
+    if (loadBtn) {
+      loadBtn.addEventListener("click", async () => {
+        const countrySel = document.getElementById("country-select");
+        const indicatorSel = document.getElementById("indicator-select");
+        const country = countrySel ? countrySel.value : null;
+        const indicator = indicatorSel ? indicatorSel.value : null;
+
+        if (!country || !indicator) {
+          updateStatus("PLEASE SELECT BOTH COUNTRY AND INDICATOR");
+          updateDataModeBanner("Data mode: waiting for user selection.");
+          return;
+        }
+
+        updateStatus("LOADING DATA FOR SELECTION...");
+        const ok = await loadDataAndPrepare(indicator, country);
+        if (ok) {
+          await window.runScenario("growth"); // run default scenario on new data
+        }
+      });
+    }
+
+    // Initial status (no data loaded)
+    updateStatus("READY: SELECT COUNTRY + INDICATOR, THEN CLICK LOAD DATA");
+    updateDataModeBanner("Data mode: waiting for user selection.");
   } catch (error) {
     updateStatus(`CRITICAL ERROR: ${error.message.toUpperCase()}`);
     console.error("Initialization failed:", error);
@@ -268,7 +283,14 @@ async function init() {
 function renderTable(data) {
   const head = document.getElementById("table-head");
   const body = document.getElementById("table-body");
-  if (!head || !body || !data || data.length === 0) return;
+  if (!head || !body) return;
+
+  if (!data || data.length === 0) {
+    head.innerHTML = "";
+    body.innerHTML =
+      '<tr><td colspan="4" style="text-align:center;padding:20px;">No data loaded. Choose a country and indicator, then click "Load data".</td></tr>';
+    return;
+  }
 
   const cols = Object.keys(data[0]);
 
@@ -296,6 +318,15 @@ function renderChart(data, kpiDefinitions) {
 
   const ctx = canvas.getContext("2d");
   if (chart) chart.destroy();
+
+  if (!data || data.length === 0 || !kpiDefinitions || kpiDefinitions.length === 0) {
+    chart = new Chart(ctx, {
+      type: "line",
+      data: { labels: [], datasets: [] },
+      options: { plugins: { legend: { display: false } } }
+    });
+    return;
+  }
 
   const sortedData = [...data].sort((a, b) => a.date - b.date);
   const palette = ["#FF9900", "#00FF00", "#0099FF", "#FF3366"];
