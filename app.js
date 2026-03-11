@@ -85,6 +85,7 @@ let db, conn, chart;
  * indicator: e.g. "FM.LBL.MQMY.GD.ZS"
  * country:   e.g. "EMU"
  */
+
 async function fetchAllWorldBankData(indicator, country) {
   let allData = [];
   let page = 1;
@@ -92,17 +93,16 @@ async function fetchAllWorldBankData(indicator, country) {
 
   try {
     do {
-      const url = `https://api.worldbank.org/v2/country/${country}/indicator/${indicator}?format=json&page=${page}&per_page=100`; // [web:31][web:38]
+      const url = `https://api.worldbank.org/v2/country/${country}/indicator/${indicator}?format=json&page=${page}&per_page=100`;
+      console.log("WB URL:", url); // DEBUG
+
       const response = await fetch(url);
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      console.log("WB status:", response.status); // DEBUG
 
       const json = await response.json();
+      console.log("WB JSON page", page, ":", json); // DEBUG
 
-      // World Bank returns [meta, data] or [error]
       if (!json || !Array.isArray(json) || !json[1]) {
-        if (page === 1) {
-          console.warn("World Bank API returned no data structure:", json);
-        }
         break;
       }
 
@@ -123,11 +123,11 @@ async function fetchAllWorldBankData(indicator, country) {
       page++;
     } while (page <= totalPages);
   } catch (err) {
+    console.error("World Bank error:", err);
     throw new Error(`World Bank API unreachable: ${err.message}`);
   }
 
-  // Sort ascending by date to keep everything deterministic
-  allData.sort((a, b) => a.date - b.date);
+  console.log("Total observations:", allData.length); // DEBUG
   return allData;
 }
 
