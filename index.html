@@ -7,15 +7,58 @@
   <link rel="stylesheet" href="style.css" />
 
   <!-- Chart.js (must load before app.js so global Chart is defined) -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js/dist/chart.umd.min.js"></script> <!-- [web:17][web:21] -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js/dist/chart.umd.min.js"></script>
 </head>
 <body>
   <div class="container">
     <header>
       <h1>Macro-Investment SQL Lab</h1>
+
+      <!-- High-level status + data mode info -->
       <div id="status-indicator">SYSTEM INITIALIZING...</div>
+      <div id="data-mode-banner" class="data-mode-banner">
+        Loading data source description…
+      </div>
     </header>
 
+    <!-- New: What data is this? -->
+    <section class="panel" style="border-color:#4CAF50; margin-bottom: 20px;">
+      <div class="panel-header">Data Source & Coverage</div>
+      <div class="panel-body">
+        <p>
+          This lab uses annual <strong>GDP per capita (constant 2015 US$)</strong> from the
+          <strong>World Bank</strong> for <strong>Germany (DEU)</strong>. The indicator code is
+          <code>NY.GDP.PCAP.KD</code>. It measures economic output per person, adjusted for
+          inflation, and is widely used to track living standards over time. [web:72]
+        </p>
+        <p>
+          If the live World Bank API is not reachable from your browser, the lab automatically
+          switches to a small built‑in demo series with similar behavior so that all scenarios
+          still run and visualize correctly.
+        </p>
+      </div>
+    </section>
+
+    <!-- New: How this lab works -->
+    <section class="panel" style="border-color:#0099FF; margin-bottom: 20px;">
+      <div class="panel-header">How This Lab Works</div>
+      <div class="panel-body">
+        <p>
+          A lightweight <strong>DuckDB-WASM</strong> database runs entirely inside your browser
+          (no server, no backend). The lab loads macroeconomic time series into DuckDB and then
+          executes analytical <strong>SQL</strong> scenarios to compute growth, volatility, and
+          moving averages. [web:80][web:25]
+        </p>
+        <p>
+          Each scenario uses a different window function (such as <code>LAG</code>,
+          <code>AVG</code>, or <code>STDDEV_SAMP</code>) and immediately updates the chart,
+          insight text, and result table so you can see how changes in SQL logic alter the
+          investment story.
+        </p>
+      </div>
+    </section>
+
+    <!-- Analytical Scenarios -->
     <div class="panel" style="border-color: #FF9900; margin-bottom: 20px;">
       <div class="panel-header">Analytical Scenarios (Select to Execute SQL)</div>
       <div class="controls" id="scenario-controls">
@@ -25,6 +68,7 @@
       </div>
     </div>
 
+    <!-- Visuals & Business Insights -->
     <div class="dashboard-grid">
       <section class="panel">
         <div class="panel-header">Global Liquidity Visualization</div>
@@ -43,6 +87,7 @@
       </section>
     </div>
 
+    <!-- Technical Proof (The SQL) + Result Table -->
     <div class="dashboard-grid">
       <section class="panel">
         <div class="panel-header">Executed SQL Query (DuckDB WASM)</div>
@@ -80,7 +125,7 @@
       "
     >
       <div>
-        SOURCE: WORLD BANK OPEN DATA (BROAD MONEY % OF GDP) // PROCESSED VIA DUCKDB-WASM
+        SOURCE: WORLD BANK OPEN DATA (GDP PER CAPITA, CONSTANT 2015 US$) // PROCESSED VIA DUCKDB-WASM [web:72]
       </div>
       <div style="margin-top: 10px;">
         BUILD BY
@@ -94,7 +139,7 @@
     </footer>
   </div>
 
-  <!-- Main analytical logic (production-ready app.js from previous message) -->
+  <!-- Main analytical logic -->
   <script type="module" src="app.js"></script>
 </body>
 </html>
