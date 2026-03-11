@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Investment Analytics | Terminal Portfolio</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Load Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net"></script>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Macro-Investment SQL Lab</h1>
+        <div id="status-indicator">SYSTEM READY // SYNCING WORLD BANK API...</div>
+    </header>
+
+    <!-- Analytical Scenarios for HR -->
+    <div class="panel" style="border-color: #FF9900; margin-bottom: 20px;">
+        <div class="panel-header">Analytical Scenarios (Select to Execute SQL)</div>
+        <div class="controls" id="scenario-controls">
+            <button onclick="runScenario('growth')">1. Liquidity Growth (LAG)</button>
+            <button onclick="runScenario('volatility')">2. Risk Volatility (STDDEV)</button>
+            <button onclick="runScenario('smoothing')">3. Trend Smoothing (AVG OVER)</button>
+        </div>
+    </div>
+
+    <!-- Visuals & Business Insights -->
+    <div class="dashboard-grid">
+        <section class="panel">
+            <div class="panel-header">Global Liquidity Visualization</div>
+            <div class="chart-wrap">
+                <canvas id="main-chart"></canvas>
+            </div>
+        </section>
+
+        <section class="panel">
+            <div class="panel-header">Strategic Business Insight</div>
+            <div id="insight-box" class="business-insight">
+                Initializing engine... Select a scenario above to demonstrate how <strong>SQL Logic</strong> translates raw macroeconomic data into <strong>Investment Strategy</strong>.
+            </div>
+        </section>
+    </div>
+
+    <!-- Technical Proof (The SQL) -->
+    <div class="dashboard-grid">
+        <section class="panel">
+            <div class="panel-header">Executed SQL Query (DuckDB WASM)</div>
+            <div id="sql-display">-- SQL Code will appear here...</div>
+        </section>
+
+        <section class="panel">
+            <div class="panel-header">Processed Result Set</div>
+            <div class="table-wrap">
+                <table id="resultsTable">
+                    <thead><tr id="table-head"><th>DATE</th><th>VALUE</th></tr></thead>
+                    <tbody id="table-body">
+                        <tr><td colspan="2">Awaiting execution...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+
+    <footer style="text-align: center; color: #666; font-size: 11px; margin-top: 40px; border-top: 1px solid #333; padding-top: 20px;">
+        <div>SOURCE: WORLD BANK OPEN DATA (BROAD MONEY % OF GDP) // PROCESSED VIA DUCKDB-WASM</div>
+        <div style="margin-top: 10px;">
+            BUILD BY <a href="https://www.linkedin.com/in/zakharovaa/" target="_blank" style="color: #FF9900; text-decoration: none; font-weight: bold;">ANDREY ZAKHAROV</a>
+        </div>
+    </footer>
+</div>
+
+<script type="module" src="app.js"></script>
+
+</body>
+</html>
